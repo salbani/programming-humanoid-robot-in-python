@@ -19,9 +19,15 @@
     # preceding the point, the second describes the curve following the point.
 '''
 
+import os
+import sys
+sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'software_installation'))
 
 from pid import PIDAgent
-from keyframes import hello
+from keyframes import hello, wipe_forehead
+from scipy import interpolate
+from spark_agent import Perception
+
 
 
 class AngleInterpolationAgent(PIDAgent):
@@ -38,13 +44,20 @@ class AngleInterpolationAgent(PIDAgent):
         self.target_joints.update(target_joints)
         return super(AngleInterpolationAgent, self).think(perception)
 
-    def angle_interpolation(self, keyframes, perception):
-        target_joints = {}
-        # YOUR CODE HERE
+    def init_splines(self):
+        joint_angles = list(map(lambda joint : list(map(lambda key : key[0], joint)), self.keyframes[2]))
+        self.splines = list(map(lambda times, angles : interpolate.splrep(times, angles, s=0), self.keyframes[1], joint_angles)) 
 
-        return target_joints
+    def angle_interpolation(self, keyframes, perception: Perception):
+        if not hasattr(self, 'start_time'):
+            self.start_time = perception.time
+            
+        target_angles = list(map(lambda spline : interpolate.splev([perception.time - self.start_time], spline)[0], self.splines))
+
+        return dict(zip(keyframes[0], target_angles))
 
 if __name__ == '__main__':
     agent = AngleInterpolationAgent()
-    agent.keyframes = hello()  # CHANGE DIFFERENT KEYFRAMES
+    agent.keyframes = wipe_forehead()  # CHANGE DIFFERENT KEYFRAMES
+    agent.init_splines()
     agent.run()
