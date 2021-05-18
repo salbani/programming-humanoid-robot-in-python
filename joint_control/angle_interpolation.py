@@ -77,7 +77,10 @@ class AngleInterpolationAgent(PIDAgent):
             self.stop_animation()
 
         target_joints = dict(zip(keyframes[0], target_angles))
-        target_joints["RHipYawPitch"] = target_joints["LHipYawPitch"]
+        
+        if "LHipYawPitch" in target_joints:
+            target_joints["RHipYawPitch"] = target_joints["LHipYawPitch"]
+            
         return target_joints
 
 if __name__ == '__main__':
