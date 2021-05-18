@@ -24,10 +24,10 @@ class StandingUpAgent(PostureRecognitionAgent):
         # YOUR CODE HERE
         
         if posture == 'Belly' and not self.is_animating():
-            self.start_animation(leftBellyToStand())
+            self.start_animation(rightBellyToStand())
         
         if posture == 'Back' and not self.is_animating():
-            self.start_animation(rightBackToStand())
+            self.start_animation(leftBackToStand())
 
 class TestStandingUpAgent(StandingUpAgent):
     '''this agent turns off all motor to falls down in fixed cycles
