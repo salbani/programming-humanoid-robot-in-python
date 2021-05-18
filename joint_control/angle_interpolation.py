@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'software_installation'))
 
 from pid import PIDAgent
-from keyframes import hello, wipe_forehead
+from keyframes import hello, rightBackToStand
 from scipy import interpolate
 from spark_agent import Perception
 
@@ -44,20 +44,43 @@ class AngleInterpolationAgent(PIDAgent):
         self.target_joints.update(target_joints)
         return super(AngleInterpolationAgent, self).think(perception)
 
-    def init_splines(self):
+    def start_animation(self, keyframes):
+        self.start_time = -1
+        self.keyframes = keyframes
         joint_angles = list(map(lambda joint : list(map(lambda key : key[0], joint)), self.keyframes[2]))
-        self.splines = list(map(lambda times, angles : interpolate.splrep(times, angles, s=0), self.keyframes[1], joint_angles)) 
+        self.splines = list(map(lambda times, angles : interpolate.splrep(times, angles, s=0), self.keyframes[1], joint_angles))
 
-    def angle_interpolation(self, keyframes, perception: Perception):
-        if not hasattr(self, 'start_time'):
+    def stop_animation(self):
+        del self.start_time
+        self.keyframes = ([],[],[])
+        print('stopped animation')
+
+    def is_animating(self):
+        return hasattr(self, 'start_time')
+
+    def angle_interpolation(self, keyframes, perception):
+        if not self.is_animating():
+            return {}
+
+        if self.start_time == -1:
             self.start_time = perception.time
-            
-        target_angles = list(map(lambda spline : interpolate.splev([perception.time - self.start_time], spline)[0], self.splines))
 
-        return dict(zip(keyframes[0], target_angles))
+        time = perception.time - self.start_time
+        print('animate', time)
+            
+        finished_keyframes = list(map(lambda times : times[-1] < time, keyframes[1]))
+
+        last_angles = list(map(lambda keys : keys[-1][0], keyframes[2]))
+        target_angles = list(map(lambda spline, finished, last_angle : interpolate.splev([time], spline)[0] if not finished else last_angle, self.splines, finished_keyframes, last_angles))
+
+        if all(finished_keyframes):
+            self.stop_animation()
+
+        target_joints = dict(zip(keyframes[0], target_angles))
+        target_joints["RHipYawPitch"] = target_joints["LHipYawPitch"]
+        return target_joints
 
 if __name__ == '__main__':
-    agent = AngleInterpolationAgent()
-    agent.keyframes = wipe_forehead()  # CHANGE DIFFERENT KEYFRAMES
-    agent.init_splines()
+    agent = AngleInterpolationAgent()     
+    agent.start_animation(rightBackToStand()) # CHANGE DIFFERENT KEYFRAMES
     agent.run()
