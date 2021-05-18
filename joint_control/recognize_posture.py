@@ -45,6 +45,9 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
         index = self.posture_classifier.predict(data)
         posture =  self.posture_classes[index[0]]
 
+        if posture != self.posture:
+            print('posture changed to: ' + posture)
+
         return posture
 
 if __name__ == '__main__':
