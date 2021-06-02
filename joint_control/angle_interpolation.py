@@ -48,7 +48,8 @@ class AngleInterpolationAgent(PIDAgent):
         self.start_time = -1
         self.keyframes = keyframes
         joint_angles = list(map(lambda joint : list(map(lambda key : key[0], joint)), self.keyframes[2]))
-        self.splines = list(map(lambda times, angles : interpolate.splrep(times, angles, s=0), self.keyframes[1], joint_angles))
+        ks = list(map(lambda times : min([3, len(times)-1-(len(times)%2)]), keyframes[1]))       
+        self.splines = list(map(lambda times, angles, k : interpolate.splrep(times, angles, s=0, k=k), self.keyframes[1], joint_angles, ks))
         print('started animation')
 
     def stop_animation(self):
