@@ -1,0 +1,6 @@
+{
+  "python.pythonPath": "c:\\Python27\\python.exe",
+  "python.analysis.extraPaths": [
+    "C:\\Users\\Simon\\Workspace\\Uni\\PJ Rob\\programming-humanoid-robot-in-python\\software_installation"
+  ]
+}

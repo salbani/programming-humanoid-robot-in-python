@@ -1,0 +1,10 @@
+{
+  "python.analysis.extraPaths": [
+    "C:\\Users\\Simon\\Workspace\\Uni\\PJ Rob\\programming-humanoid-robot-in-python\\software_installation",
+    "C:\\Users\\Simon\\Workspace\\Uni\\PJ Rob\\programming-humanoid-robot-in-python\\joint_control",
+  ],
+  "python.formatting.autopep8Args": [
+    "--max-line-length=200"
+  ],
+  "python.pythonPath": "c:\\Python27\\python.exe"
+}
