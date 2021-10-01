@@ -8,3 +8,7 @@ from .rightBellyToStand import rightBellyToStand
 
 from .hello import hello
 from .wipe_forehead import wipe_forehead
+from .questionable import questionable
+from .sad import sad
+from .handsDown import handsDown
+from .handsUp import handsUp
